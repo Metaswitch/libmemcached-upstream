@@ -1,5 +1,5 @@
 /*  vim:expandtab:shiftwidth=2:tabstop=2:smarttab:
- * 
+ *
  *  Libmemcached library
  *
  *  Copyright (C) 2011 Data Differential, http://datadifferential.com/
@@ -128,7 +128,12 @@ void memcached_quit_server(org::libmemcached::Instance* ptr, bool io_death)
   // we don't have stale server version information.
   ptr->major_version= ptr->minor_version= ptr->micro_version= UINT8_MAX;
 
-  if (io_death)
+  // If using UDP, we should stop using the server briefly on every IO
+  // failure. If using TCP, it may be that the connection went down a
+  // short while ago (e.g. the server failed) and we've only just
+  // noticed, so we should only set the retry timeout on a connect
+  // failure (which doesn't call this method).
+  if (io_death and memcached_is_udp(ptr->root))
   {
     memcached_mark_server_for_timeout(ptr);
   }
