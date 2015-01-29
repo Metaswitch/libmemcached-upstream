@@ -1,5 +1,5 @@
 /*  vim:expandtab:shiftwidth=2:tabstop=2:smarttab:
- * 
+ *
  *  Libmemcached library
  *
  *  Copyright (C) 2011 Data Differential, http://datadifferential.com/
@@ -48,10 +48,19 @@ memcached_return_t memcached_set(memcached_st *ptr, const char *key, size_t key_
                                  time_t expiration,
                                  uint32_t  flags);
 LIBMEMCACHED_API
+memcached_return_t memcached_set_vb(memcached_st *ptr, const char *key, size_t key_length, const uint16_t vbucket,
+                                    const char *value, size_t value_length,
+                                    time_t expiration,
+                                    uint32_t  flags);
+LIBMEMCACHED_API
 memcached_return_t memcached_add(memcached_st *ptr, const char *key, size_t key_length,
                                  const char *value, size_t value_length,
                                  time_t expiration,
                                  uint32_t  flags);
+memcached_return_t memcached_add_vb(memcached_st *ptr, const char *key, size_t key_length, const uint16_t vbucket,
+                                    const char *value, size_t value_length,
+                                    time_t expiration,
+                                    uint32_t  flags);
 LIBMEMCACHED_API
 memcached_return_t memcached_replace(memcached_st *ptr, const char *key, size_t key_length,
                                      const char *value, size_t value_length,
@@ -76,6 +85,14 @@ memcached_return_t memcached_cas(memcached_st *ptr,
                                  time_t expiration,
                                  uint32_t flags,
                                  uint64_t cas);
+LIBMEMCACHED_API
+memcached_return_t memcached_cas_vb(memcached_st *ptr,
+                                    const char *key, size_t key_length,
+                                    const uint16_t vbucket,
+                                    const char *value, size_t value_length,
+                                    time_t expiration,
+                                    uint32_t flags,
+                                    uint64_t cas);
 
 LIBMEMCACHED_API
 memcached_return_t memcached_set_by_key(memcached_st *ptr,
