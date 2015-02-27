@@ -202,7 +202,8 @@ memcached_result_st *memcached_fetch_result(memcached_st *ptr,
     {
       continue;
     }
-    else if (*error == MEMCACHED_CONNECTION_FAILURE)
+    else if ((*error == MEMCACHED_CONNECTION_FAILURE) ||
+             (*error == MEMCACHED_TIMEOUT))
     {
       connection_failures = true;
       continue;
