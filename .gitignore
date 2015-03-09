@@ -29,3 +29,4 @@ clients
 c_sasl_test
 c_test
 cc_test
+config/test-driver
