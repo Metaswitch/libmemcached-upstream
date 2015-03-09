@@ -393,7 +393,7 @@ memcached_return_t memcached_mget_by_key(memcached_st *ptr,
                                          size_t number_of_keys)
 {
   return memcached_mget_by_key_real(ptr, group_key, group_key_length, keys,
-                                    key_length, number_of_keys, (number_of_keys == 1));
+                                    key_length, number_of_keys, false);
 }
 
 memcached_return_t memcached_mget_execute(memcached_st *ptr,
