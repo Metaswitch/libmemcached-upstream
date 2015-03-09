@@ -57,6 +57,7 @@ memcached_return_t memcached_add(memcached_st *ptr, const char *key, size_t key_
                                  const char *value, size_t value_length,
                                  time_t expiration,
                                  uint32_t  flags);
+LIBMEMCACHED_API
 memcached_return_t memcached_add_vb(memcached_st *ptr, const char *key, size_t key_length, const uint16_t vbucket,
                                     const char *value, size_t value_length,
                                     time_t expiration,
