@@ -30,3 +30,11 @@ c_sasl_test
 c_test
 cc_test
 config/test-driver
+config/compile
+config/config.guess
+config/config.sub
+config/depcomp
+config/install-sh
+config/ltmain.sh
+config/missing
+m4/libtool.m4
