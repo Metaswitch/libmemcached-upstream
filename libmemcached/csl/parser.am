@@ -1,7 +1,7 @@
 # vim:ft=automake
 # included from Top Level Makefile.am
 # All paths should be given relative to the root
- 
+
 EXTRA_DIST+= libmemcached/csl/parser.yy
 EXTRA_DIST+= libmemcached/csl/scanner.l
 
@@ -9,7 +9,7 @@ libmemcached/csl/parser.h: libmemcached/csl/parser.cc
 
 # This makefile is incompatible with new versions of bison. This means that running the rules for parser.cc or scanner.cc
 # will break the build. Instead of just removing the rule, we force make to use low resolution (i.e nearest second)
-# timestmaps. This means that the targets are not regenerated after an initial checkout, but they are if someone
+# timestamps. This means that the targets are not regenerated after an initial checkout, but they are if someone
 # actually changes any of the dependencies.
 
 .LOW_RESOLUTION_TIME: libmemcached/csl/parser.cc
