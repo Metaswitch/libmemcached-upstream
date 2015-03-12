@@ -7,10 +7,17 @@ EXTRA_DIST+= libmemcached/csl/scanner.l
 
 libmemcached/csl/parser.h: libmemcached/csl/parser.cc
 
+# This makefile is incompatible with new versions of bison. This means that running the rules for parser.cc or scanner.cc 
+# will break the build. Instead of just removing the rule, we force make to use low resolution (i.e nearest second) 
+# timestmaps. This means that the targets are not regenerated after an initial checkout, but they are if someone 
+# actually changes any of the dependencies. 
+
+.LOW_RESOLUTION_TIME: libmemcached/csl/parser.cc
 libmemcached/csl/parser.cc: libmemcached/csl/parser.yy libmemcached/csl/scanner.l libmemcached/csl/scanner.h
 	$(AM_V_YACC)$(am__skipyacc) $(YACC) $(YLFLAGS) $(AM_YFLAGS) -o $@ $<
 
 libmemcached/csl/scanner.h: libmemcached/csl/scanner.cc
 
+.LOW_RESOLUTION_TIME: libmemcached/csl/parser.cc
 libmemcached/csl/scanner.cc: libmemcached/csl/scanner.l libmemcached/csl/parser.yy
 	$(AM_V_GEN)$(LEX) $<
