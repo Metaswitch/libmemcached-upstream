@@ -68,6 +68,12 @@ memcached_return_t memcached_replace(memcached_st *ptr, const char *key, size_t 
                                      time_t expiration,
                                      uint32_t  flags);
 LIBMEMCACHED_API
+memcached_return_t memcached_replace_vb(memcached_st *ptr,
+                                        const char *key, size_t key_length, const uint16_t vbucket,
+                                        const char *value, size_t value_length,
+                                        time_t expiration,
+                                        uint32_t  flags);
+LIBMEMCACHED_API
 memcached_return_t memcached_append(memcached_st *ptr,
                                     const char *key, size_t key_length,
                                     const char *value, size_t value_length,

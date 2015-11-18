@@ -513,6 +513,21 @@ memcached_return_t memcached_replace(memcached_st *ptr,
   return rc;
 }
 
+memcached_return_t memcached_replace_vb(memcached_st *ptr,
+                                        const char *key, size_t key_length, const uint16_t vbucket,
+                                        const char *value, size_t value_length,
+                                        time_t expiration,
+                                        uint32_t  flags)
+{
+  memcached_return_t rc;
+  LIBMEMCACHED_MEMCACHED_REPLACE_START();
+  rc= memcached_send(ptr, key, key_length,
+                     key, key_length, vbucket, value, value_length,
+                     expiration, flags, 0, REPLACE_OP);
+  LIBMEMCACHED_MEMCACHED_REPLACE_END();
+  return rc;
+}
+
 memcached_return_t memcached_prepend(memcached_st *ptr,
                                      const char *key, size_t key_length,
                                      const char *value, size_t value_length,
