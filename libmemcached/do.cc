@@ -20,6 +20,33 @@ memcached_return_t memcached_vdo(org::libmemcached::Instance* instance,
 
   assert_msg(vector, "Invalid vector passed");
 
+  // Check if the socket has been shutdown or has failed under our feet.
+  if (instance->fd != INVALID_SOCKET)
+  {
+    // Do a non-blocking read to determine the state of the socket.  This can
+    // give four possible results:
+    // 1.  There is data waiting to be read. The socket is healthy.
+    // 2.  recv() fails with a "would block" error. The socket is healthy but
+    //     there is no data right now.
+    // 3.  recv() fails with another error. The socket is not healthy.
+    // 4.  recv() returns no data.  This means the socket has been closed by the
+    //     remote host.
+    //
+    // Reset the socket if we get 3) or 4).  We use the MSG_PEEK flag so that
+    // the read doesn't remove any data from the socket.
+    uint8_t buf[1];
+    ssize_t rc = recv(instance->fd, buf, sizeof(buf), MSG_PEEK | MSG_DONTWAIT);
+
+    if ((rc < 0) && (errno != EAGAIN) & (errno != EWOULDBLOCK))
+    {
+      memcached_io_reset(instance);
+    }
+    else if (rc == 0)
+    {
+      memcached_io_reset(instance);
+    }
+  }
+
   if (memcached_failed(rc= memcached_connect(instance)))
   {
     WATCHPOINT_ERROR(rc);
@@ -36,7 +63,7 @@ memcached_return_t memcached_vdo(org::libmemcached::Instance* instance,
   {
     if (vector[0].buffer or vector[0].length)
     {
-      return memcached_set_error(*instance->root, MEMCACHED_NOT_SUPPORTED, MEMCACHED_AT, 
+      return memcached_set_error(*instance->root, MEMCACHED_NOT_SUPPORTED, MEMCACHED_AT,
                                  memcached_literal_param("UDP messages was attempted, but vector was not setup for it"));
     }
 
