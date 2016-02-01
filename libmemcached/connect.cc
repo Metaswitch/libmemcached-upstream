@@ -655,17 +655,29 @@ static memcached_return_t _memcached_connect(org::libmemcached::Instance* server
     //
     // Reset the socket if we get 3) or 4).  We use the MSG_PEEK flag so that
     // the read doesn't remove any data from the socket.
+    //
+    // We do this in a loop to guard against spurious wake-ups.
     uint8_t buf[1];
-    ssize_t rc = recv(server->fd, buf, sizeof(buf), MSG_PEEK | MSG_DONTWAIT);
+    bool retry;
 
-    if ((rc < 0) && (errno != EAGAIN) & (errno != EWOULDBLOCK))
+    do
     {
-      memcached_io_reset(server);
-    }
-    else if (rc == 0)
-    {
-      memcached_io_reset(server);
-    }
+      retry = false;
+      ssize_t rc = recv(server->fd, buf, sizeof(buf), MSG_PEEK | MSG_DONTWAIT);
+
+      if ((rc < 0) && (errno == EINTR))
+      {
+        retry = true;
+      }
+      if ((rc < 0) && (errno != EAGAIN) && (errno != EWOULDBLOCK))
+      {
+        memcached_io_reset(server);
+      }
+      else if (rc == 0)
+      {
+        memcached_io_reset(server);
+      }
+    } while (retry)
   }
 
   assert(server);
