@@ -677,7 +677,7 @@ static memcached_return_t _memcached_connect(org::libmemcached::Instance* server
       {
         memcached_io_reset(server);
       }
-    } while (retry)
+    } while (retry);
   }
 
   assert(server);
