@@ -36,7 +36,7 @@ memcached_return_t memcached_vdo(org::libmemcached::Instance* instance,
   {
     if (vector[0].buffer or vector[0].length)
     {
-      return memcached_set_error(*instance->root, MEMCACHED_NOT_SUPPORTED, MEMCACHED_AT,
+      return memcached_set_error(*instance->root, MEMCACHED_NOT_SUPPORTED, MEMCACHED_AT, 
                                  memcached_literal_param("UDP messages was attempted, but vector was not setup for it"));
     }
 
