@@ -641,6 +641,45 @@ static memcached_return_t backoff_handling(org::libmemcached::Instance* server, 
 
 static memcached_return_t _memcached_connect(org::libmemcached::Instance* server, const bool set_last_disconnected)
 {
+  // Check if the socket has been shutdown or has failed under our feet.
+  if (server->fd != INVALID_SOCKET)
+  {
+    // Do a non-blocking read to determine the state of the socket.  This can
+    // give four possible results:
+    // 1.  There is data waiting to be read. The socket is healthy.
+    // 2.  recv() fails with a "would block" error. The socket is healthy but
+    //     there is no data right now.
+    // 3.  recv() fails with another error. The socket is not healthy.
+    // 4.  recv() returns no data.  This means the socket has been closed by the
+    //     remote host.
+    //
+    // Reset the socket if we get 3) or 4).  We use the MSG_PEEK flag so that
+    // the read doesn't remove any data from the socket.
+    //
+    // We do this in a loop to guard against spurious wake-ups.
+    uint8_t buf[1];
+    bool retry;
+
+    do
+    {
+      retry = false;
+      ssize_t rc = recv(server->fd, buf, sizeof(buf), MSG_PEEK | MSG_DONTWAIT);
+
+      if ((rc < 0) && (errno == EINTR))
+      {
+        retry = true;
+      }
+      if ((rc < 0) && (errno != EAGAIN) && (errno != EWOULDBLOCK))
+      {
+        memcached_io_reset(server);
+      }
+      else if (rc == 0)
+      {
+        memcached_io_reset(server);
+      }
+    } while (retry);
+  }
+
   assert(server);
   if (server->fd != INVALID_SOCKET)
   {
