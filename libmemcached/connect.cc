@@ -1,5 +1,5 @@
 /*  vim:expandtab:shiftwidth=2:tabstop=2:smarttab:
- * 
+ *
  *  Libmemcached library
  *
  *  Copyright (C) 2011 Data Differential, http://datadifferential.com/
@@ -42,9 +42,59 @@
 #include <ctime>
 #include <sys/time.h>
 
-#ifndef SOCK_CLOEXEC 
+#ifndef SOCK_CLOEXEC
 #define SOCK_CLOEXEC 0
 #endif
+
+memcached_return_t bind_socket(org::libmemcached::Instance* server,
+                               int ai_family,
+                               memcached_string_t addr)
+{
+  if (ai_family == AF_INET)
+  {
+    struct sockaddr_in sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin_family = ai_family;
+    int rc = inet_pton(ai_family, addr.c_str, &sa.sin_addr);
+
+    if (rc == 1)
+    {
+      rc = bind(server->fd, (const struct sockaddr*)&sa, sizeof(sa));
+
+      if (rc != 0)
+      {
+        return memcached_set_errno(*server, get_socket_errno(), NULL);
+      }
+    }
+    else
+    {
+      return MEMCACHED_FAILURE;
+    }
+  }
+  else
+  {
+    struct sockaddr_in6 sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sin6_family = ai_family;
+    int rc = inet_pton(ai_family, addr.c_str, &sa.sin6_addr);
+
+    if (rc == 1)
+    {
+      rc = bind(server->fd, (const struct sockaddr*)&sa, sizeof(sa));
+
+      if (rc != 0)
+      {
+        return memcached_set_errno(*server, get_socket_errno(), NULL);
+      }
+    }
+    else
+    {
+      return MEMCACHED_FAILURE;
+    }
+  }
+
+  return MEMCACHED_SUCCESS;
+}
 
 static memcached_return_t connect_poll(org::libmemcached::Instance* server)
 {
@@ -91,7 +141,7 @@ static memcached_return_t connect_poll(org::libmemcached::Instance* server)
             {
               if (err == 0)
               {
-                // This should never happen, if it does? Punt.  
+                // This should never happen, if it does? Punt.
                 continue;
               }
               local_errno= err;
@@ -113,7 +163,7 @@ static memcached_return_t connect_poll(org::libmemcached::Instance* server)
     }
 
     if (fds[0].revents & POLLERR or
-        fds[0].revents & POLLHUP or 
+        fds[0].revents & POLLHUP or
         fds[0].revents & POLLNVAL)
     {
       int err;
@@ -468,6 +518,22 @@ static memcached_return_t network_connect(org::libmemcached::Instance* server)
       return memcached_set_errno(*server, get_socket_errno(), NULL);
     }
 
+    /* If a source address is specified, bind to it */
+    memcached_string_t source_addr =
+      memcached_array_to_string(server->root->configure.source_address);
+
+    if (source_addr.size > 0)
+    {
+      memcached_return_t rc = bind_socket(server,
+                                          server->address_info_next->ai_family,
+                                          source_addr);
+
+      if (rc != 0)
+      {
+        return rc;
+      }
+    }
+
     if (HAVE_SOCK_CLOEXEC == 0)
     {
 #ifdef FD_CLOEXEC
@@ -577,7 +643,7 @@ static memcached_return_t backoff_handling(org::libmemcached::Instance* server, 
   struct timeval curr_time;
   bool _gettime_success= (gettimeofday(&curr_time, NULL) == 0);
 
-  /* 
+  /*
     If we hit server_failure_limit then something is completely wrong about the server.
 
     1) If autoeject is enabled we do that.
@@ -586,7 +652,7 @@ static memcached_return_t backoff_handling(org::libmemcached::Instance* server, 
   if (server->server_failure_counter >= server->root->server_failure_limit)
   {
     /*
-      We just auto_eject if we hit this point 
+      We just auto_eject if we hit this point
     */
     if (_is_auto_eject_host(server->root))
     {
