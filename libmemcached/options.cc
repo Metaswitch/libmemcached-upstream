@@ -1,5 +1,5 @@
 /*  vim:expandtab:shiftwidth=2:tabstop=2:smarttab:
- * 
+ *
  *  Libmemcached library
  *
  *  Copyright (C) 2011 Data Differential, http://datadifferential.com/
@@ -66,7 +66,7 @@ static memcached_return_t _parse_file_options(memcached_st& self, memcached_arra
   while (fgets(buffer, sizeof(buffer), fp))
   {
     size_t length= strlen(buffer);
-    
+
     if (length == 1 and buffer[0] == '\n')
       continue;
 
@@ -145,6 +145,15 @@ void memcached_set_configuration_file(memcached_st *self, const char *filename, 
   assert_msg(filename_length, "Invalid filename_length");
   memcached_array_free(self->configure.filename);
   self->configure.filename= memcached_strcpy(self, filename, filename_length);
+}
+
+
+void memcached_set_source_address(memcached_st *self, const char *addr, size_t addr_len)
+{
+  assert_msg(addr, "Invalid source address");
+  assert_msg(addr_len, "Invalid source address length");
+  memcached_array_free(self->configure.source_address);
+  self->configure.source_address= memcached_strcpy(self, addr, addr_len);
 }
 
 memcached_return_t memcached_parse_configure_file(memcached_st& self, const char *filename, size_t length)
