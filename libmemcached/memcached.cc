@@ -1,5 +1,5 @@
 /*  vim:expandtab:shiftwidth=2:tabstop=2:smarttab:
- * 
+ *
  *  Libmemcached library
  *
  *  Copyright (C) 2011 Data Differential, http://datadifferential.com/
@@ -122,6 +122,7 @@ static inline bool _memcached_init(memcached_st *self)
   self->configure.max_pool_size= 1;
   self->configure.version= -1;
   self->configure.filename= NULL;
+  self->configure.source_address = NULL;
 
   return true;
 }
@@ -240,7 +241,7 @@ memcached_st *memcached(const char *string, size_t length)
   {
     rc= memcached_parse_configure_file(*memc, memcached_parse_filename(memc), memcached_parse_filename_length(memc));
   }
-    
+
   if (memcached_failed(rc))
   {
     memcached_free(memc);

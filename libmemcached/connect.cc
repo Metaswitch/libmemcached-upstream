@@ -519,18 +519,21 @@ static memcached_return_t network_connect(org::libmemcached::Instance* server)
     }
 
     /* If a source address is specified, bind to it */
-    memcached_string_t source_addr =
-      memcached_array_to_string(server->root->configure.source_address);
-
-    if (source_addr.size > 0)
+    if (server->root->configure.source_address)
     {
-      memcached_return_t rc = bind_socket(server,
-                                          server->address_info_next->ai_family,
-                                          source_addr);
+      memcached_string_t source_addr =
+        memcached_array_to_string(server->root->configure.source_address);
 
-      if (rc != 0)
+      if (source_addr.size > 0)
       {
-        return rc;
+        memcached_return_t rc = bind_socket(server,
+                                            server->address_info_next->ai_family,
+                                            source_addr);
+
+        if (rc != 0)
+        {
+          return rc;
+        }
       }
     }
 
