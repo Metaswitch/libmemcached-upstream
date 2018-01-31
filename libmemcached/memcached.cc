@@ -122,7 +122,7 @@ static inline bool _memcached_init(memcached_st *self)
   self->configure.max_pool_size= 1;
   self->configure.version= -1;
   self->configure.filename= NULL;
-  self->configure.source_address = NULL;
+  self->configure.source_address= NULL;
 
   return true;
 }
@@ -159,6 +159,9 @@ static void __memcached_free(memcached_st *ptr, bool release_st)
   {
     memcached_array_free(ptr->configure.filename);
     ptr->configure.filename= NULL;
+
+    memcached_array_free(ptr->configure.source_address);
+    ptr->configure.source_address= NULL;
   }
 
   hashkit_free(&ptr->hashkit);
@@ -372,7 +375,8 @@ memcached_st *memcached_clone(memcached_st *clone, const memcached_st *source)
 
 
   new_clone->_namespace= memcached_array_clone(new_clone, source->_namespace);
-  new_clone->configure.filename= memcached_array_clone(new_clone, source->_namespace);
+  new_clone->configure.filename= memcached_array_clone(new_clone, source->configure.filename);
+  new_clone->configure.source_address= memcached_array_clone(new_clone, source->configure.source_address);
   new_clone->configure.version= source->configure.version;
 
   if (LIBMEMCACHED_WITH_SASL_SUPPORT and source->sasl.callbacks)
