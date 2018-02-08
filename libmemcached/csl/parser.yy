@@ -64,11 +64,11 @@
 
 int conf_lex(YYSTYPE* lvalp, void* scanner);
 
-#define select_yychar(__context) yychar == UNKNOWN ? ( (__context)->previous_token == END ? UNKNOWN : (__context)->previous_token ) : yychar   
+#define select_yychar(__context) yychar == UNKNOWN ? ( (__context)->previous_token == END ? UNKNOWN : (__context)->previous_token ) : yychar
 
 #define stryytname(__yytokentype) ((__yytokentype) <  YYNTOKENS ) ? yytname[(__yytokentype)] : ""
 
-#define parser_abort(__context, __error_message) do { (__context)->abort((__error_message), yytokentype(select_yychar(__context)), stryytname(YYTRANSLATE(select_yychar(__context)))); YYABORT; } while (0) 
+#define parser_abort(__context, __error_message) do { (__context)->abort((__error_message), yytokentype(select_yychar(__context)), stryytname(YYTRANSLATE(select_yychar(__context)))); YYABORT; } while (0)
 
 // This is bison calling error.
 inline void __config_error(Context *context, yyscan_t *scanner, const char *error, int last_token, const char *last_token_str)
@@ -134,6 +134,7 @@ inline void __config_error(Context *context, yyscan_t *scanner, const char *erro
 %token _TCP_KEEPIDLE
 %token _TCP_NODELAY
 %token FETCH_VERSION
+%token SOURCE_ADDRESS
 
 /* Callbacks */
 %token NAMESPACE
@@ -258,6 +259,10 @@ expression:
         | CONFIGURE_FILE string
           {
             memcached_set_configuration_file(context->memc, $2.c_str, $2.size);
+          }
+        | SOURCE_ADDRESS string
+          {
+            memcached_set_source_address(context->memc, $2.c_str, $2.size);
           }
         | POOL_MIN NUMBER
           {
@@ -392,7 +397,7 @@ behavior_number:
           }
         ;
 
-behavior_boolean: 
+behavior_boolean:
           BINARY_PROTOCOL
           {
             $$= MEMCACHED_BEHAVIOR_BINARY_PROTOCOL;
@@ -520,9 +525,9 @@ distribution:
           }
         ;
 
-%% 
+%%
 
-void Context::start() 
+void Context::start()
 {
   config_parse(this, (void **)scanner);
 }

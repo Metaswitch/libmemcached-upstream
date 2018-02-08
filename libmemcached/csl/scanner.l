@@ -150,6 +150,7 @@
 "--NAMESPACE="	       		        { yyextra->begin= yytext; return yyextra->previous_token= NAMESPACE; }
 
 "--FETCH-VERSION"	       		        { yyextra->begin= yytext; return yyextra->previous_token= FETCH_VERSION; }
+"--SOURCE-ADDRESS="			{ yyextra->begin= yytext; return yyextra->previous_token= SOURCE_ADDRESS; }
 
 INCLUDE           { yyextra->begin= yytext; return yyextra->previous_token= INCLUDE; }
 RESET           { yyextra->begin= yytext; return yyextra->previous_token= RESET; }

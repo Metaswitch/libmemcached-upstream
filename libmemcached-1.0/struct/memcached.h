@@ -1,5 +1,5 @@
 /*  vim:expandtab:shiftwidth=2:tabstop=2:smarttab:
- * 
+ *
  *  Libmemcached library
  *
  *  Copyright (C) 2011 Data Differential, http://datadifferential.com/
@@ -124,6 +124,7 @@ struct memcached_st {
     uint32_t max_pool_size;
     int32_t version; // This is used by pool and others to determine if the memcached_st is out of date.
     struct memcached_array_st *filename;
+    struct memcached_array_st *source_address;
   } configure;
   struct {
     bool is_allocated:1;
