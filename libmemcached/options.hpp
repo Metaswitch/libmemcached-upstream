@@ -1,5 +1,5 @@
 /*  vim:expandtab:shiftwidth=2:tabstop=2:smarttab:
- * 
+ *
  *  Libmemcached library
  *
  *  Copyright (C) 2011 Data Differential, http://datadifferential.com/
@@ -39,6 +39,9 @@
 
 LIBMEMCACHED_LOCAL
   void memcached_set_configuration_file(memcached_st *self, const char *filename, size_t filename_length);
+
+LIBMEMCACHED_LOCAL
+  void memcached_set_source_address(memcached_st *self, const char *addr, size_t addr_len);
 
 LIBMEMCACHED_LOCAL
   const char *memcached_parse_filename(memcached_st *memc);
